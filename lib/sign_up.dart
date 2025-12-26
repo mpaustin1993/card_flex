@@ -61,6 +61,31 @@ class _SignUpState extends State<SignUp> {
               ),
               actions: [
                 TextButton(
+                  onPressed: () async {
+                    try {
+                      await userCredential.user?.sendEmailVerification();
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Verification email sent!'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Failed to resend email. Please try again later.'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    }
+                  },
+                  child: const Text('Resend Email'),
+                ),
+                TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                     Navigator.of(context).pop(); // Return to login

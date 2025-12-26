@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'main.dart';
 import 'sign_up.dart';
+import 'verification.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -270,9 +271,27 @@ class _LoginState extends State<Login> {
                         ),
                         const SizedBox(height: 16),
                         TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            // TODO: Implement forgot password
+                          },
                           child: Text(
                             'Forgot Password?',
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.secondary,
+                            ),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const EmailVerification(),
+                              ),
+                            );
+                          },
+                          child: Text(
+                            'Didn\'t receive verification email?',
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.secondary,
                             ),

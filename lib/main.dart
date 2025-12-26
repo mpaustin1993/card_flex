@@ -36,8 +36,8 @@ class MyApp extends StatelessWidget {
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFFFFCB05), // Pokemon yellow
-          primary: const Color(0xFFFFCB05), // Pokemon yellow
+          seedColor: const Color(0xFF2196F3), // Material Blue
+          primary: const Color(0xFF2196F3), // Material Blue
           secondary: const Color(0xFF3B4CCA), // Pokemon blue
           tertiary: const Color(0xFFCC0000), // Pokemon red
         ),
