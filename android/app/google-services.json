@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "459352817410",
+    "project_id": "card-flex",
+    "storage_bucket": "card-flex.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:459352817410:android:9879e0365fda7fce9ecc1b",
+        "android_client_info": {
+          "package_name": "com.example.card_flex"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCCUw5vRC8GpYC4ysb--g1owtirpmTPElk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

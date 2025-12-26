@@ -1,0 +1,25 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "card-flex",
+          "appId": "1:459352817410:android:9879e0365fda7fce9ecc1b",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "card-flex",
+          "configurations": {
+            "android": "1:459352817410:android:9879e0365fda7fce9ecc1b",
+            "ios": "1:459352817410:ios:8d5be0f460b62cd69ecc1b",
+            "macos": "1:459352817410:ios:8d5be0f460b62cd69ecc1b",
+            "web": "1:459352817410:web:41c725142756e5419ecc1b",
+            "windows": "1:459352817410:web:caa7d65761e423ed9ecc1b"
+          }
+        }
+      }
+    }
+  }
+}
