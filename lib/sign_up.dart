@@ -74,6 +74,10 @@ class _SignUpState extends State<SignUp> {
       } on FirebaseAuthException catch (e) {
         String errorMessage;
 
+        // Debug logging
+        print('Firebase Auth Error Code: ${e.code}');
+        print('Firebase Auth Error Message: ${e.message}');
+
         switch (e.code) {
           case 'weak-password':
             errorMessage = 'The password is too weak.';
@@ -88,7 +92,7 @@ class _SignUpState extends State<SignUp> {
             errorMessage = 'Email/password accounts are not enabled.';
             break;
           default:
-            errorMessage = 'Sign up failed. Please try again.';
+            errorMessage = 'Sign up failed: ${e.code} - ${e.message}';
         }
 
         if (mounted) {
@@ -97,10 +101,11 @@ class _SignUpState extends State<SignUp> {
           );
         }
       } catch (e) {
+        print('Unexpected error during sign up: $e');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('An unexpected error occurred.'),
+            SnackBar(
+              content: Text('An unexpected error occurred: $e'),
               backgroundColor: Colors.red,
             ),
           );
