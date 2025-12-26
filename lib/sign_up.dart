@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'main.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
@@ -16,6 +16,7 @@ class _SignUpState extends State<SignUp> {
   final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -26,15 +27,91 @@ class _SignUpState extends State<SignUp> {
     super.dispose();
   }
 
-  void _handleSignUp() {
+  Future<void> _handleSignUp() async {
     if (_formKey.currentState!.validate()) {
-      // Navigate to home page
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const MyHomePage(title: 'Card Flex'),
-        ),
-      );
+      setState(() {
+        _isLoading = true;
+      });
+
+      try {
+        // Create user account
+        UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+        );
+
+        // Update display name
+        await userCredential.user?.updateDisplayName(_nameController.text.trim());
+
+        // Send email verification
+        await userCredential.user?.sendEmailVerification();
+
+        if (mounted) {
+          // Show success dialog
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => AlertDialog(
+              title: const Text('Verify Your Email'),
+              content: Text(
+                'A verification email has been sent to ${_emailController.text.trim()}.\n\nPlease check your inbox and verify your email before logging in.',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pop(); // Return to login
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+          );
+        }
+      } on FirebaseAuthException catch (e) {
+        String errorMessage;
+        
+        switch (e.code) {
+          case 'weak-password':
+            errorMessage = 'The password is too weak.';
+            break;
+          case 'email-already-in-use':
+            errorMessage = 'An account already exists with this email.';
+            break;
+          case 'invalid-email':
+            errorMessage = 'Invalid email address.';
+            break;
+          case 'operation-not-allowed':
+            errorMessage = 'Email/password accounts are not enabled.';
+            break;
+          default:
+            errorMessage = 'Sign up failed. Please try again.';
+        }
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(errorMessage),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('An unexpected error occurred.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
     }
   }
 
@@ -56,21 +133,23 @@ class _SignUpState extends State<SignUp> {
           child: Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24.0),
-              child: Card(
-                elevation: 8,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(32.0),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Icons.catching_pokemon,
-                          size: 80,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 450),
+                child: Card(
+                  elevation: 8,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(32.0),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.catching_pokemon,
+                            size: 80,
                           color: Color(0xFFCC0000),
                         ),
                         const SizedBox(height: 16),
@@ -198,7 +277,7 @@ class _SignUpState extends State<SignUp> {
                           width: double.infinity,
                           height: 50,
                           child: ElevatedButton(
-                            onPressed: _handleSignUp,
+                            onPressed: _isLoading ? null : _handleSignUp,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Theme.of(context).colorScheme.tertiary,
                               foregroundColor: Colors.white,
@@ -206,13 +285,22 @@ class _SignUpState extends State<SignUp> {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                             ),
-                            child: const Text(
-                              'Sign Up',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                            child: _isLoading
+                                ? const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Text(
+                                    'Sign Up',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -242,6 +330,7 @@ class _SignUpState extends State<SignUp> {
             ),
           ),
         ),
+      ),
       ),
     );
   }

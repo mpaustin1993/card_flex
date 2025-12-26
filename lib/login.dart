@@ -15,7 +15,6 @@ class _LoginState extends State<Login> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
-  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -26,15 +25,67 @@ class _LoginState extends State<Login> {
 
   Future<void> _handleLogin() async {
     if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
-
       try {
-        await FirebaseAuth.instance.signInWithEmailAndPassword(
+        UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: _emailController.text.trim(),
           password: _passwordController.text,
         );
+
+        // Check if email is verified
+        if (userCredential.user != null && !userCredential.user!.emailVerified) {
+          // Sign out the user
+          await FirebaseAuth.instance.signOut();
+          
+          if (mounted) {
+            // Show verification required dialog
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text('Email Not Verified'),
+                content: const Text(
+                  'Please verify your email address before logging in. Check your inbox for the verification email.',
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('OK'),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      // Resend verification email
+                      final navigator = Navigator.of(context);
+                      final scaffoldMessenger = ScaffoldMessenger.of(context);
+                      try {
+                        await userCredential.user?.sendEmailVerification();
+                        if (mounted) {
+                          navigator.pop();
+                          scaffoldMessenger.showSnackBar(
+                            const SnackBar(
+                              content: Text('Verification email sent!'),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        if (mounted) {
+                          navigator.pop();
+                          scaffoldMessenger.showSnackBar(
+                            const SnackBar(
+                              content: Text('Failed to send verification email.'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      }
+                    },
+                    child: const Text('Resend Email'),
+                  ),
+                ],
+              ),
+            );
+          }
+          return;
+        }
 
         // Navigate to home page on successful login
         if (mounted) {
@@ -85,12 +136,6 @@ class _LoginState extends State<Login> {
             ),
           );
         }
-      } finally {
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-          });
-        }
       }
     }
   }
@@ -113,18 +158,20 @@ class _LoginState extends State<Login> {
           child: Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24.0),
-              child: Card(
-                elevation: 8,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(32.0),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 450),
+                child: Card(
+                  elevation: 8,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(32.0),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
                         const Icon(
                           Icons.catching_pokemon,
                           size: 80,
@@ -223,9 +270,7 @@ class _LoginState extends State<Login> {
                         ),
                         const SizedBox(height: 16),
                         TextButton(
-                          onPressed: () {
-                            // TODO: Implement forgot password
-                          },
+                          onPressed: () {},
                           child: Text(
                             'Forgot Password?',
                             style: TextStyle(
@@ -265,6 +310,7 @@ class _LoginState extends State<Login> {
             ),
           ),
         ),
+      ),
       ),
     );
   }
