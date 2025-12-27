@@ -75,10 +75,57 @@ class CardScannerService {
       final cardName = extractCardName(ocrText);
       print('Extracted card name: $cardName');
 
-      // Search for card in Pokemon TCG API
-      final cardData = await searchPokemonCard(cardName);
+      // Parse additional likely card parameters from OCR
+      final lines = ocrText
+          .split('\n')
+          .map((l) => l.trim())
+          .where((l) => l.isNotEmpty)
+          .toList();
 
-      return cardData;
+      String? hp;
+      String? rarity;
+      String? number;
+
+      final hpReg = RegExp(r"(\\d{1,3})\\s*HP", caseSensitive: false);
+      final hpReg2 = RegExp(r"HP\\s*(\\d{1,3})", caseSensitive: false);
+      final rarityReg = RegExp(r"\\b(Common|Uncommon|Rare|Holo|Ultra Rare|Secret Rare|Promo|Rare Holo|Holofoil)\\b",
+          caseSensitive: false);
+      final numberReg = RegExp(r"\\b(\\d{1,3}/\\d{1,3})\\b");
+
+      for (var line in lines) {
+        if (hp == null) {
+          final m = hpReg.firstMatch(line) ?? hpReg2.firstMatch(line);
+          if (m != null && m.groupCount >= 1) {
+            hp = m.group(1);
+          }
+        }
+
+        if (rarity == null) {
+          final m = rarityReg.firstMatch(line);
+          if (m != null) {
+            rarity = m.group(1);
+          }
+        }
+
+        if (number == null) {
+          final m = numberReg.firstMatch(line);
+          if (m != null) {
+            number = m.group(1);
+          }
+        }
+
+        if (hp != null && rarity != null && number != null) break;
+      }
+
+      final result = <String, dynamic>{
+        'name': cardName,
+        'hp': hp,
+        'rarity': rarity,
+        'number': number,
+        'rawText': ocrText,
+      };
+
+      return result;
     } catch (e) {
       print('Error processing card: $e');
       return null;

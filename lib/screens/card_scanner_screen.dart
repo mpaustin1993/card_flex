@@ -194,21 +194,28 @@ class _CardScannerScreenState extends State<CardScannerScreen> {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        if (_scannedCard!['set'] != null)
-                          Text(
-                            'Set: ${_scannedCard!['set']['name']}',
-                            style: TextStyle(color: Colors.grey[700]),
-                          ),
-                        if (_scannedCard!['rarity'] != null)
-                          Text(
-                            'Rarity: ${_scannedCard!['rarity']}',
-                            style: TextStyle(color: Colors.grey[700]),
-                          ),
-                        if (_scannedCard!['hp'] != null)
-                          Text(
-                            'HP: ${_scannedCard!['hp']}',
-                            style: TextStyle(color: Colors.grey[700]),
-                          ),
+                        Text(
+                          'HP: ${_scannedCard!['hp'] ?? 'Unknown'}',
+                          style: TextStyle(color: Colors.grey[700]),
+                        ),
+                        Text(
+                          'Rarity: ${_scannedCard!['rarity'] ?? 'Unknown'}',
+                          style: TextStyle(color: Colors.grey[700]),
+                        ),
+                        Text(
+                          'Number: ${_scannedCard!['number'] ?? 'Unknown'}',
+                          style: TextStyle(color: Colors.grey[700]),
+                        ),
+                        const SizedBox(height: 8),
+                        ExpansionTile(
+                          title: const Text('Raw OCR Text'),
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(_scannedCard!['rawText'] ?? ''),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ),
