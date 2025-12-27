@@ -24,10 +24,6 @@ class DefaultFirebaseOptions {
         return android;
       case TargetPlatform.iOS:
         return ios;
-      case TargetPlatform.macOS:
-        return macos;
-      case TargetPlatform.windows:
-        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -64,23 +60,5 @@ class DefaultFirebaseOptions {
     projectId: 'card-flex',
     storageBucket: 'card-flex.firebasestorage.app',
     iosBundleId: 'com.example.cardFlex',
-  );
-
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyDr_-KycbE4zOsxFqdLwzvB8GP7CL8G7IM',
-    appId: '1:459352817410:ios:8d5be0f460b62cd69ecc1b',
-    messagingSenderId: '459352817410',
-    projectId: 'card-flex',
-    storageBucket: 'card-flex.firebasestorage.app',
-    iosBundleId: 'com.example.cardFlex',
-  );
-
-  static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyDjGXEk49YfYNtqSveFfdBmCgaYJwtolmE',
-    appId: '1:459352817410:web:caa7d65761e423ed9ecc1b',
-    messagingSenderId: '459352817410',
-    projectId: 'card-flex',
-    authDomain: 'card-flex.firebaseapp.com',
-    storageBucket: 'card-flex.firebasestorage.app',
   );
 }
