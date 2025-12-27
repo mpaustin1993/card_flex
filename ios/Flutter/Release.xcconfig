@@ -1,7 +1,7 @@
 #include "Generated.xcconfig"
 
-#if !defined(PODS_XCCONFIG_INCLUDED)
+/* Include CocoaPods xcconfig files. Removed the #if guard because some Xcode
+   versions report "unsupported preprocessor directive 'if'" when parsing
+   these generated xcconfig files. */
 #include "Pods/Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"
 #include "Pods/Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"
-#define PODS_XCCONFIG_INCLUDED
-#endif
